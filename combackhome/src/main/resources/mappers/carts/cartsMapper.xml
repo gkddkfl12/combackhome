@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 다른 mapper와 중복되지 않도록 네임스페이스 기재 -->
+<mapper namespace="carts">
+	<select id="cartList" resultType="com.example.combackhome.model.cart.dto.CartsDTO">
+		select p.pimg, c.cnum, p.pimg, p.pname, p.pprice, c.camount
+		from carts c, products p, team_join t
+		where c.userid=t.userid and c.pnum=p.pnum and t.userid=#{userid} and c.orders='Y'
+		
+	</select>
+	<select id="sumMoney" resultType="int">
+		select nvl(sum(p.pprice * c.camount) ,0) money
+		from products p, carts c 
+		where c.pnum=p.pnum 
+		and c.userid=#{userid}
+		and c.orders='Y'
+	</select>
+	<delete id="delete">
+		delete from carts where cnum=#{cnum}
+	</delete>
+	<update id="modifyCart">
+	 update carts 
+	 set camount=#{camount}
+	 where cnum=#{cnum}
+	</update>
+	
+	<delete id="deleteAll">
+		delete from carts
+		where userid=#{userid} and orders='Y'
+	</delete>
+	
+	<insert id="insert">
+		 insert into carts(cnum,pnum,camount,userid)
+		values (carts_seq.nextval,#{pnum},#{camount},#{userid})
+	</insert>
+	<select id="cart_money" resultType="com.example.combackhome.model.cart.dto.CartsDTO" >
+		select p.pname , sum(p.pprice*c.camount) money
+		from carts c, products p 
+		where c.pnum=p.pnum and c.orders='N'
+		group by  p.pname 
+		order by  p.pname
+	</select>
+	<select id="usergender" resultType="com.example.combackhome.model.order.dto.UserDTO">
+		 	select gender, count(*) countGender
+   		 	from team_join
+    		group by gender
+	</select>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

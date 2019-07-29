@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 다른 mapper와 중복되지 않도록 네임스페이스 기재 -->
+<mapper namespace="order">
+	<select id="list" resultType="com.example.combackhome.model.cart.dto.CartsDTO">
+		select c.cnum, p.pname, p.pprice, c.camount,t.userid
+		from carts c, products p, team_join t
+		where c.userid=t.userid and c.pnum=p.pnum and t.userid=#{userid} and c.orders='Y' 
+	</select>
+	
+	<select id="user" resultType="com.example.combackhome.model.order.dto.UserDTO">
+		select userid, name, address, zipcode, email from team_join where userid=#{userid}
+	</select>
+	
+	<select id="sum" resultType="int">
+		select nvl(sum(p.pprice * c.camount) ,0) money
+		from products p, carts c 
+		where c.pnum=p.pnum 
+		and c.userid=#{userid} and c.orders='Y'
+	
+	</select>
+	
+	<insert id="onlyOrder">
+		insert into carts(cnum, pnum, camount, userid, orders)
+		values (carts_seq.nextval, #{pnum},#{camount},#{userid},'O')
+	</insert>
+	<update id="updateCartList">
+		update carts set orders='N' where userid=#{userid}
+	</update>
+	
+	<select id="cartsListFinal" resultType="com.example.combackhome.model.cart.dto.CartsDTO">
+	    select p.pimg, c.cnum, p.pname, p.pprice, c.camount, t.userid, c.orders, c.ostatus
+		from carts c, products p, team_join t
+		where c.userid=t.userid and c.pnum=p.pnum and t.userid=#{userid}
+		and c.orders='N'
+	</select>
+	<select id="finalSum" resultType="int">
+		select nvl(sum(p.pprice * c.camount) ,0) money
+		from products p, carts c 
+		where c.pnum=p.pnum 
+		and c.userid=#{userid}
+		and c.orders='N'
+	</select>
+	<insert id="orderInsertMember">
+		insert into orders(onum, userid, name, address, zipcode, email,ome)
+		values (orders_seq.nextval,#{userid},#{name},#{address},#{zipcode},#{email},#{ome})
+	</insert>
+	
+	<select id="onlyOrderList" resultType="com.example.combackhome.model.cart.dto.CartsDTO">
+	select c.cnum, p.pname, p.pprice, c.camount, t.userid, c.orders
+		from carts c, products p, team_join t
+		where c.userid=t.userid and c.pnum=p.pnum 
+		and t.userid=#{userid} and c.orders='O'
+		
+	</select>
+	<select id="oSumMoeny" resultType="int">
+		select nvl(sum(p.pprice * c.camount) ,0) money
+		from products p, carts c 
+		where c.pnum=p.pnum 
+		and c.userid=#{userid} and c.orders='O'
+		
+	</select>
+	
+	<select id="listO" resultType="com.example.combackhome.model.cart.dto.CartsDTO">
+	<include refid="paging_header" />
+	 select  c.cnum, p.pnum, c.userid, p.pimg, p.pname, c.camount, c.ostatus 
+     from carts c, products p 
+     where c.pnum = p.pnum and c.orders = 'N' 
+     order by c.cnum
+     <include refid="paging_footer" />
+	</select>
+	
+	<sql id="paging_header">
+		select *
+		from (
+		    select rownum as rn, A.*
+		    from (	
+	</sql>
+	<sql id="paging_footer">
+		    ) A
+		) where rn between #{start} and #{end}	
+	</sql>
+	
+	  <select id="countArticle" resultType="int">
+    select count(*) 
+    from carts where orders='N' 
+  </select>
+	
+	
+	<update id="updateOstatus1">
+		update carts set ostatus=1 where cnum=#{cnum}
+	</update>
+	
+  <update id="updateOstatus2">
+		update carts set ostatus=2 where cnum=#{cnum}
+	</update>
+  
+  <update id="updateOstatus3">
+		update carts set ostatus=3 where cnum=#{cnum}
+	</update>
+  
+  <update id="updateOstatus4">
+		update carts set ostatus=4 where cnum=#{cnum}
+	</update>
+	
+  <delete id="delete">
+		delete from carts where cnum=#{cnum}
+	</delete>
+	
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

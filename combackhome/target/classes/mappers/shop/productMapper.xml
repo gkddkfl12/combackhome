@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 다른 mapper와 중복되지 않도록 네임스페이스 기재 -->
+<mapper namespace="product">
+ <select id="listAll"
+  resultType="com.example.combackhome.model.shop.dto.ProductDTO">
+  <include refid="paging_header" />
+  select pnum,pname,pamount,pprice,pimg,pdtail,pcata,pbrand,show from products 
+  <include refid="search" />
+  order by pnum
+  <include refid="paging_footer" />
+ </select> 
+ 	<sql id="paging_header">
+		select *
+		from (
+		    select rownum as rn, A.*
+		    from (	
+	</sql>
+	<sql id="paging_footer">
+		    ) A
+		) where rn between #{start} and #{end}	
+	</sql>
+	
+  <select id="countArticle" resultType="int">
+    select count(*)
+    from products
+    <include refid="search" />
+  </select>
+  
+  <sql id="search">
+    		<choose>
+			<when test="search_option != 'all' ">
+				where show='Y'
+				    and ${search_option} like #{keyword}			
+			</when>
+			<otherwise>
+				where show='Y'
+				    and (pname like #{keyword} 
+				        or pcata like #{keyword} )			
+			</otherwise>
+		</choose>
+  </sql>
+
+  <select id="read" 
+  resultType="com.example.combackhome.model.shop.dto.ProductDTO">
+    select pnum,pname,pamount,pprice,pimg,pfsize,pdtail,pcata,pbrand,show
+		from products
+		where pnum=#{pnum}	
+  </select>
+ 
+ 
+
+
+ <select id="detail_product"
+  resultType="com.example.combackhome.model.shop.dto.ProductDTO">
+  select * from products
+  where pnum=#{pnum}
+ 
+ </select>
+ 
+ <!-- 상품 등록  -->
+ <insert id="insert">
+   insert into products (pnum,pname,pamount,pprice,pimg,pdtail,pcata,main)
+    values (seq_products.nextval, #{pname}, #{pamount}, #{pprice},
+    #{pimg}, #{pdtail}, #{pcata}, #{main})
+ 
+ </insert>
+ 
+ <!-- 상품 정보 수정  -->
+ <update id="update_product">
+ update products set pname=#{pname}, 
+ pprice=#{pprice}, 
+ pdtail=#{pdtail}, 
+ pcata=#{pcata}, 
+ pamount=#{pamount}, 
+ main=#{main}
+ where pnum=#{pnum}
+ 
+ </update>
+ 
+ <!-- 첨부 파일 이름  -->
+ <select id="fileInfo" resultType="String">
+ select pimg from products
+ where pnum=#{pnum}
+ </select>
+ 
+ <!-- 상품 레코드 삭제  -->
+ <delete id="product_delete">
+ delete from products where pnum=#{pnum}
+ </delete>
+ 
+ <select id="product_list"
+  resultType="com.example.combackhome.model.homeList.dto.HomeListDTO">
+  select * from products where main = 'y'
+  order by pnum
+ </select> 
+  <select id="memo" resultType="com.example.combackhome.model.memo.dto.MemoDTO">
+select m.idx, m.userid, m.memo, p.pnum, m.post_date
+   from memo m, products p 
+   where m.pnum=p.pnum and p.pnum=#{pnum} order by post_date
+    
+   
+ </select>
+ 
+ <insert id="insert2">
+ 
+ 
+  insert into memo (idx,userid,memo,pnum) values ((select nvl(max(idx)+1,1) from memo), #{userid}, #{memo}, #{pnum})
+ 
+ </insert>
+ 
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 다른 mapper와 중복되지 않도록 네임스페이스 기재 -->
+<mapper namespace="team">
+  <select id="login_check" 
+  parameterType="com.example.combackhome.model.team_join.dto.Team_joinDTO" resultType="String">
+    select name from team_join
+	where userid=#{userid} and passwd=#{passwd}	
+  </select>
+  
+  <select id="viewMember" resultType="com.example.combackhome.model.team_join.dto.Team_joinDTO">
+		select * from team_join
+		where userid=#{userid}
+	</select>
+  
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
